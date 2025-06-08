@@ -10,7 +10,8 @@ class AppointmentList extends StatelessWidget {
     final stream = Supabase.instance.client
         .from('appointments')
         .stream(primaryKey: ['id'])
-        .eq('email', Supabase.instance.client.auth.currentUser!.email);
+        .eq('email', Supabase.instance.client.auth.currentUser?.email ?? '');
+
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Appointments')),

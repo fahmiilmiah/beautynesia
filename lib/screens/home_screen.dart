@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 16),
-          Image.asset('assets/images/logo.png', height: 100),
+          Image.asset('assets/images/logo.jpg', height: 100),
           const SizedBox(height: 8),
           const Text('Make your skin happy with us', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
