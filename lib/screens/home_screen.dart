@@ -82,7 +82,14 @@ class _TreatmentCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(20), child: Image.asset(item['img']!, fit: BoxFit.cover))),
+          SizedBox(
+            height: 120,
+            width: 120,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset(item['img']!, fit: BoxFit.cover),
+            ),
+          ),
           const SizedBox(height: 8),
           Text(item['name']!, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
