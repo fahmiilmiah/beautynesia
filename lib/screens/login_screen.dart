@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'register_screen.dart'; // ⬅️ Import layar register
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +48,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _loading ? null : _signIn,
                 child: _loading ? const CircularProgressIndicator() : const Text('Login'),
               ),
-              if (_error != null) Padding(padding: const EdgeInsets.all(8), child: Text(_error!, style: const TextStyle(color: Colors.red))),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                ),
+
+              // 👉 Tombol Daftar di bawah tombol Login
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                  );
+                },
+                child: const Text("Belum punya akun? Daftar di sini"),
+              ),
             ],
           ),
         ),
