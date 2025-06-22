@@ -69,6 +69,11 @@ flutter:
     - assets/images/treatments/micro.png
     - assets/images/treatments/peel.png
     - assets/images/treatments/salmon.png
+    - assets/images/customers/Aulia.jpeg
+    - assets/images/customers/Lahiliya.jpeg
+    - assets/images/customers/Lina.jpeg
+    - assets/images/customers/Nana.jpeg
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
