@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/appointment.dart';
+import 'package:intl/intl.dart'; // Untuk format tanggal
+import 'package:supabase_flutter/supabase_flutter.dart'; // Koneksi ke Supabase
+import '../models/appointment.dart'; // Import model Appointment
 
+// Widget halaman untuk mengedit data appointment
 class AppointmentEdit extends StatefulWidget {
-  final Appointment appointment;
+  final Appointment appointment; // Data appointment yang akan diedit
   const AppointmentEdit({super.key, required this.appointment});
 
   @override
@@ -12,14 +13,19 @@ class AppointmentEdit extends StatefulWidget {
 }
 
 class _AppointmentEditState extends State<AppointmentEdit> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(); // Key untuk validasi form
+
+  // Controller untuk input form
   late TextEditingController _name;
   late TextEditingController _email;
   late TextEditingController _complaint;
+
+  // Variabel data yang akan diedit
   late DateTime _date;
   late String? _type;
   late TimeOfDay? _time;
 
+  // Daftar treatment yang tersedia
   final List<Map<String, String>> _types = [
     {
       'name': 'Botox Inject',
@@ -69,6 +75,8 @@ class _AppointmentEditState extends State<AppointmentEdit> {
   void initState() {
     super.initState();
     final a = widget.appointment;
+
+    // Inisialisasi nilai input dengan data appointment yang diterima
     _name = TextEditingController(text: a.name);
     _email = TextEditingController(text: a.email);
     _complaint = TextEditingController(text: a.complaint);
@@ -80,9 +88,13 @@ class _AppointmentEditState extends State<AppointmentEdit> {
     );
   }
 
+  // Fungsi untuk menyimpan perubahan ke Supabase
   Future<void> _update() async {
     if (!_formKey.currentState!.validate() || _type == null || _time == null) return;
+
     final client = Supabase.instance.client;
+
+    // Kirim data ke tabel appointments berdasarkan id
     await client.from('appointments').update({
       'customer_name': _name.text,
       'email': _email.text,
@@ -93,23 +105,43 @@ class _AppointmentEditState extends State<AppointmentEdit> {
     }).eq('id', widget.appointment.id);
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Appointment updated')));
+
+    // Tampilkan notifikasi berhasil
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Appointment updated')),
+    );
+
+    // Kembali ke halaman sebelumnya
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Appointment')),
+      appBar: AppBar(title: const Text('Edit Appointment')), // Judul halaman
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16), // Jarak dari tepi layar
         child: Form(
-          key: _formKey,
+          key: _formKey, // Form validation
           child: ListView(
             children: [
-              TextFormField(controller: _name, decoration: const InputDecoration(labelText: 'Name'), validator: (v) => v!.isEmpty ? 'Required' : null),
-              TextFormField(controller: _email, decoration: const InputDecoration(labelText: 'Email'), validator: (v) => v!.isEmpty ? 'Required' : null),
-              const SizedBox(height: 8),
+              // Input nama customer
+              TextFormField(
+                controller: _name,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+
+              // Input email customer
+              TextFormField(
+                controller: _email,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+
+              const SizedBox(height: 8), // Jarak antar input
+
+              // Pilih treatment
               ListTile(
                 title: Text(_type ?? 'Pilih Treatment'),
                 trailing: const Icon(Icons.arrow_drop_down),
@@ -143,8 +175,8 @@ class _AppointmentEditState extends State<AppointmentEdit> {
                               ),
                               subtitle: Text('${t['desc']} • ${t['price']}'),
                               onTap: () {
-                                setState(() => _type = t['name']);
-                                Navigator.pop(context);
+                                setState(() => _type = t['name']); // Simpan pilihan
+                                Navigator.pop(context); // Tutup dialog
                               },
                             );
                           },
@@ -154,18 +186,36 @@ class _AppointmentEditState extends State<AppointmentEdit> {
                   );
                 },
               ),
+
               const SizedBox(height: 8),
+
+              // Pilih jam
               ListTile(
-                title: Text(_time == null ? 'Choose Time' : _time!.format(context)),
+                title: Text(_time == null ? 'Pilih Waktu' : _time!.format(context)),
                 trailing: const Icon(Icons.schedule),
                 onTap: () async {
-                  final picked = await showTimePicker(context: context, initialTime: _time!);
-                  if (picked != null) setState(() => _time = picked);
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: _time!,
+                  );
+                  if (picked != null) setState(() => _time = picked); // Simpan waktu baru
                 },
               ),
-              TextFormField(controller: _complaint, maxLines: 3, decoration: const InputDecoration(labelText: 'Complaint / Note')),
+
+              // Input keluhan
+              TextFormField(
+                controller: _complaint,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Keluhan / Catatan'),
+              ),
+
               const SizedBox(height: 24),
-              FilledButton(onPressed: _update, child: const Text('Update')),
+
+              // Tombol update
+              FilledButton(
+                onPressed: _update,
+                child: const Text('Update'),
+              ),
             ],
           ),
         ),

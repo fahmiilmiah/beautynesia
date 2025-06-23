@@ -10,14 +10,22 @@ class AppointmentForm extends StatefulWidget {
 }
 
 class _AppointmentFormState extends State<AppointmentForm> {
+  // Key untuk validasi form
   final _formKey = GlobalKey<FormState>();
+
+  // Controller input text
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _complaint = TextEditingController();
+
+  // Nilai default tanggal hari ini
   final _date = DateTime.now();
+
+  // Variabel untuk menyimpan pilihan treatment & waktu
   String? _type;
   TimeOfDay? _time;
 
+  // Daftar treatment yang tersedia
   final List<Map<String, String>> _types = [
     {
       'name': 'Botox Inject',
@@ -63,9 +71,14 @@ class _AppointmentFormState extends State<AppointmentForm> {
     },
   ];
 
+  // Fungsi untuk menyimpan data appointment ke Supabase
   Future<void> _save() async {
+    // Validasi form, pastikan semua diisi
     if (!_formKey.currentState!.validate() || _type == null || _time == null) return;
+
     final client = Supabase.instance.client;
+
+    // Kirim data ke Supabase
     await client.from('appointments').insert({
       'customer_name': _name.text,
       'email': _email.text,
@@ -74,8 +87,15 @@ class _AppointmentFormState extends State<AppointmentForm> {
       'waktu': _time!.format(context),
       'keluhan': _complaint.text,
     });
+
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Appointment saved')));
+
+    // Tampilkan notifikasi sukses
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Appointment saved')),
+    );
+
+    // Kembali ke halaman sebelumnya
     Navigator.pop(context);
   }
 
@@ -89,21 +109,25 @@ class _AppointmentFormState extends State<AppointmentForm> {
           key: _formKey,
           child: ListView(
             children: [
+              // Input Nama
               TextFormField(
                 controller: _name,
                 decoration: const InputDecoration(labelText: 'Name'),
                 validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
+              // Input Email
               TextFormField(
                 controller: _email,
                 decoration: const InputDecoration(labelText: 'Email'),
                 validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 8),
+              // Pemilihan Treatment
               ListTile(
                 title: Text(_type ?? 'Pilih Treatment'),
                 trailing: const Icon(Icons.arrow_drop_down),
                 onTap: () {
+                  // Tampilkan dialog pilihan treatment
                   showDialog(
                     context: context,
                     builder: (_) {
@@ -134,6 +158,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                 ),
                                 subtitle: Text('${t['desc']} • ${t['price']}'),
                                 onTap: () {
+                                  // Simpan nama treatment
                                   setState(() => _type = t['name']);
                                   Navigator.pop(context);
                                 },
@@ -147,6 +172,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                 },
               ),
               const SizedBox(height: 8),
+              // Pilih Waktu
               ListTile(
                 title: Text(_time == null ? 'Pilih Waktu' : _time!.format(context)),
                 trailing: const Icon(Icons.schedule),
@@ -158,12 +184,14 @@ class _AppointmentFormState extends State<AppointmentForm> {
                   if (picked != null) setState(() => _time = picked);
                 },
               ),
+              // Input Keluhan atau Catatan
               TextFormField(
                 controller: _complaint,
                 maxLines: 3,
                 decoration: const InputDecoration(labelText: 'Keluhan / Catatan'),
               ),
               const SizedBox(height: 24),
+              // Tombol Simpan
               FilledButton(
                 onPressed: _save,
                 child: const Text('Simpan'),
